@@ -1,12 +1,10 @@
-import axios from 'axios';
-
 let submitButton = document.querySelector('#app form button');
 let cepAdress = document.querySelector('#app form input');
 let content = document.querySelector('#app main');
 
-submitButton.addEventListener('click', buttonAction); 
+submitButton.addEventListener('click', buttonAction);
 
-function buttonAction(event) {
+async function buttonAction(event) {
     event.preventDefault();
 
     let cep = cepAdress.value;
@@ -16,19 +14,21 @@ function buttonAction(event) {
     cep = cep.replace('.', '');
     cep = cep.trim();
 
-    axios
-    .get('https://viacep.com.br/ws/' + cep + '/json/')
-    .then(function(response){
+    try {
+        const response = await fetch('https://viacep.com.br/ws/' + cep + '/json/');
+        if (!response.ok) {
+            throw new Error('Erro ao buscar CEP');
+        }
+        const data = await response.json();
         content.innerHTML = '';
-        createLine(response.data.logradouro + ', ' + response.data.localidade);
-        createLine(response.data.uf);
-    })
-    .catch(function(error){
+        createLine(data.logradouro + ', ' + data.localidade);
+        createLine(data.uf);
+    } catch (error) {
         console.log(error);
-    })
+    }
 }
 
-function createLine (text) {
+function createLine(text) {
     let line = document.createElement('p');
     let textNode = document.createTextNode(text);
 
