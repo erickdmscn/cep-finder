@@ -16,15 +16,18 @@ async function buttonAction(event) {
 
     try {
         const response = await fetch('https://viacep.com.br/ws/' + cep + '/json/');
-        if (!response.ok) {
-            throw new Error('Erro ao buscar CEP');
-        }
         const data = await response.json();
+        if (data.erro) {
+            content.innerHTML = ''
+            throw new Error('CEP inválido');         
+        }
         content.innerHTML = '';
         createLine(data.logradouro + ', ' + data.localidade);
         createLine(data.uf);
     } catch (error) {
+        content.innerHTML = ''; 
         console.log(error);
+        createLine('CEP inválido');
     }
 }
 
